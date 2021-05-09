@@ -1,17 +1,35 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <input type="file" @change="choseFile"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import { S3 } from '@aws-sdk/client-s3'
+import { Upload } from '@aws-sdk/lib-storage'
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
+  methods: {
+    async choseFile ({ target }) {
+      const file = target.files[0]
+      const upload = new Upload({
+        client: new S3({
+          credentials: {
+            accessKeyId: '',
+            secretAccessKey: ''
+          },
+          region: 'us-east-1'
+        }),
+        params: {
+          Bucket: 'bucket',
+          Body: file,
+          Key: 'filename'
+        }
+      })
+
+      await upload.done()
+    }
   }
 }
 </script>
